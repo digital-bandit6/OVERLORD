@@ -217,7 +217,7 @@ int search_entry(Firewall *head){
 	Firewall *current = head;
 	while(current){
 		if(strcmp(current->hostname,input) == 0){
-			printf("Domain: %s\nType: %s\nPlatform: %s\nSerial Number: %s\nCurrent Version: %s\nHostname: %s\nHA State: %s\nVIP: %s\nSelf IP: %s\nManager: %s\nManager Adom: %s\nAnalyzer: %s\nAnalyzer Adom: %s\nConsole Server: %s\nConsole TTY: %s\n-------------------------------------\n",
+			printf("Domain: %s\nType: %s\nPlatform: %s\nSerial Number: %s\nCurrent Version: %s\nHostname: %s\nHA State: %s\nVIP: %s\nSelf IP: %s\nManager: %s\nManager Adom: %s\nAnalyzer: %s\nAnalyzer Adom: %s\nConsole Server: %s\nConsole TTY: %s\n------------------------------------------------------------\n",
 			current->domain,current->device_type,current->device_platform,
 			current->serial_number,current->current_version,current->hostname,
 			current->ha_state,current->vip,current->selfip,current->manager,
