@@ -5,7 +5,14 @@
 #include "logdb.h"
 #include "firewall_file_ops.h"
 
+void clear_screen(void){
+	#ifdef _WIN32
+    		system("cls");
+	#else
+    		printf("\033[2J\033[H");
+	#endif
 
+}
 void menu(void){
 	char input[251];
 	char buffer[4096];
@@ -48,22 +55,31 @@ void menu(void){
 			filter_entries(head);
 		}
 		else if(strcmp(input,"delete") == 0){
-			delete_entry_from_file(&head);
-			if(load_csv_into_memory(&head) == 0){
-				printf("Entry Deleted and reloaded Entries into Memory\n");
-				event(FIREWALL_DELETION,SUCCESS);
+			if(delete_entry_from_file(&head) == 0){
+				free_memory(head);
+				head = NULL;
+				if(load_csv_into_memory(&head) == 0){
+					printf("Entry Deleted and Reloaded Successfully\n");
+				}
+				else{
+					printf("Error Deleting Entry");
+				}
 			}
 		}
 		else if(strcmp(input,"search") == 0){
 			search_entry(head);
 		}
+		else if(strcmp(input,"clear") == 0){
+			clear_screen();
+		}
 		if(strcmp(input,"help") == 0){
 			printf("HELP MENU\n");
-			printf("add new device -> add\n");
-			printf("modify an Entry -> modify\n");
-			printf("Print all devices -> print\n");
-			printf("delete device -> delete\n");
-			printf("search for a device -> search\n");
+			printf("add new device 		-> add\n");
+			printf("modify an Entry 	-> modify\n");
+			printf("Print all devices 	-> print\n");
+			printf("delete device 		-> delete\n");
+			printf("search for a device 	-> search\n");
+			printf("clear screen 		-> clear\n");
 			
 		}
 	

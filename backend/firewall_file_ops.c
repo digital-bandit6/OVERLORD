@@ -76,6 +76,7 @@ int load_csv_into_memory(Firewall **head){
 
 
 		for(int i = 0 ; i < field_index && i < MAXFIELDS ; i++){
+			convert_to_lower(fields[i]);
 			strncpy(firewall_fields[i],fields[i],field_size[i] - 1);
 			firewall_fields[i][field_size[i] - 1] = '\0';
 		}
@@ -170,6 +171,7 @@ int delete_entry_from_file(Firewall **head){
 	while(fgets(buffer,sizeof(buffer),file) != NULL){
 		char buffer_copy[4096];
 		strcpy(buffer_copy,buffer);
+		convert_to_lower(buffer_copy);
 		char *fields[MAXFIELDS];
 		int field_index = 0;
 		char *token = strtok(buffer_copy,",");
@@ -177,6 +179,7 @@ int delete_entry_from_file(Firewall **head){
 			fields[field_index++] = token;
 			token = strtok(NULL,",");
 		}
+
 		if(field_index > 5 && strcmp(fields[5], input) == 0){
 			while(current){
 				if(strcmp(current->hostname,input) == 0){
@@ -215,7 +218,7 @@ int search_entry(Firewall *head){
 	Firewall *current = head;
 	while(current){
 		if(strcmp(current->hostname,input) == 0){
-			printf("Domain: %s\nType: %s\nPlatform: %s\nSerial Number: %s\nCurrent Version: %s\nHostname: %s\nHA State: %s\nVIP: %s\nSelf IP: %s\nManager: %s\nManager Adom: %s\nAnalyzer: %s\nAnalyzer Adom: %s\nConsole Server: %s\nConsole TTY: %s------------------------------------------------------------\n",
+			printf("Domain: %s\nType: %s\nPlatform: %s\nSerial Number: %s\nCurrent Version: %s\nHostname: %s\nHA State: %s\nVIP: %s\nSelf IP: %s\nManager: %s\nManager Adom: %s\nAnalyzer: %s\nAnalyzer Adom: %s\nConsole Server: %s\nConsole TTY: %s\n------------------------------------------------------------\n",
 			current->domain,current->device_type,current->device_platform,
 			current->serial_number,current->current_version,current->hostname,
 			current->ha_state,current->vip,current->selfip,current->manager,
@@ -323,7 +326,7 @@ int modify_entry(Firewall **head) {
     while (fgets(buffer, sizeof(buffer), file) != NULL) {
         char buffer_copy[4096];
         strcpy(buffer_copy, buffer);
-
+	convert_to_lower(buffer_copy);
         char *field[MAXFIELDS] = {0};
         int field_index = 0;
 
@@ -357,26 +360,26 @@ int modify_entry(Firewall **head) {
             if (scanf("%d", &option) == 1 &&
                 option >= 0 && option < field_index) {
 
-                getchar(); // consume newline
+                getchar();
                 char new_value[MAXSIZE];
                 get_user_input("Enter new value: ", new_value, sizeof(new_value));
 
-                // Replace field contents directly
+                
                 field[option] = new_value;
 
                 modified = 1;
             } else {
                 printf("Invalid option.\n");
-                getchar(); // clear stdin
+                getchar(); 
             }
         }
 
-        // Write back (modified or not)
+        
         for (int i = 0; i < field_index; i++) {
             fprintf(temp, "%s", field[i]);
             if (i < field_index - 1) fprintf(temp, ",");
         }
-        fprintf(temp, "\n");
+        
 
         if (modified) {
             printf("Entry updated.\n");
