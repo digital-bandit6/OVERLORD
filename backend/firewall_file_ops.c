@@ -312,66 +312,64 @@ void print_all_entries(Firewall *head){
 }
 
 int modify_entry(Firewall **head) {
-    FILE *file = open_and_check_file(FWDATA, READ);
-    FILE *temp = open_and_check_file("temp.csv", WRITE);
-    if (!file || !temp) {
-        event(OPEN_FILE, ERROR);
-        return -1;
-    }
-
-    char input[MAXSIZE];
-    char buffer[4096];
-    get_user_input("Enter device name: ", input, sizeof(input));
-
-    while (fgets(buffer, sizeof(buffer), file) != NULL) {
-        char buffer_copy[4096];
-        strcpy(buffer_copy, buffer);
-	convert_to_lower(buffer_copy);
-        char *field[MAXFIELDS] = {0};
-        int field_index = 0;
-
-        char *token = strtok(buffer_copy, ",");
-        while (token && field_index < MAXFIELDS) {
-            field[field_index++] = token;
-            token = strtok(NULL, ",");
+    char cont[MAXSIZE];
+    do{
+        FILE *file = open_and_check_file(FWDATA, READ);
+        FILE *temp = open_and_check_file("temp.csv", WRITE);
+        if (!file || !temp) {
+                event(OPEN_FILE, ERROR);
+                return -1;
         }
+  
+        char input[MAXSIZE];
+        char buffer[4096];
+        get_user_input("Enter device name: ", input, sizeof(input));
 
-        // Default: write original line
-        int modified = 0;
+        while (fgets(buffer, sizeof(buffer), file) != NULL) {
+                char buffer_copy[4096];
+                strcpy(buffer_copy, buffer);
+                convert_to_lower(buffer_copy);
+                char *field[MAXFIELDS] = {0};
+                int field_index = 0;
 
-        if (field_index > HOSTNAME && field[HOSTNAME] &&
-            strcmp(field[HOSTNAME], input) == 0) {
-            printf("Found Entry!\n");
+                char *token = strtok(buffer_copy, ",");
+                while (token && field_index < MAXFIELDS) {
+                        field[field_index++] = token;
+                        token = strtok(NULL, ",");
+                }
 
-            const char *labels[MAXFIELDS] = {
-                "Domain","Device Type","Device Platform","Serial Number",
-                "Current Version","Hostname","HA State","VIP","SelfIP",
-                "Manager","Manager Adom","Analyzer","Analyzer Adom",
-                "Console Server","Console TTY"
-            };
+        
+                int modified = 0;
 
-            printf("Which Field will be modified?\n");
-            for (int i = 0; i < field_index; i++) {
-                printf("%d: %s -> %s\n", i, labels[i], field[i]);
-            }
+                if (field_index > HOSTNAME && field[HOSTNAME] &&
+                        strcmp(field[HOSTNAME], input) == 0) {
+                        printf("Found Entry!\n");
 
-            int option;
-            printf("Enter option: ");
-            if (scanf("%d", &option) == 1 &&
-                option >= 0 && option < field_index) {
+                        const char *labels[MAXFIELDS] = {
+                                "Domain","Device Type","Device Platform","Serial Number",
+                                "Current Version","Hostname","HA State","VIP","SelfIP",
+                                "Manager","Manager Adom","Analyzer","Analyzer Adom",
+                                "Console Server","Console TTY"
+                };
 
-                getchar();
-                char new_value[MAXSIZE];
-                get_user_input("Enter new value: ", new_value, sizeof(new_value));
+                printf("Which Field will be modified?\n");
+                for (int i = 0; i < field_index; i++) {
+                        printf("%d: %s -> %s\n", i, labels[i], field[i]);
+                }
 
-                
-                field[option] = new_value;
-
-                modified = 1;
-            } else {
-                printf("Invalid option.\n");
-                getchar(); 
-            }
+                int option;
+                 printf("Enter option: ");
+                if(scanf("%d", &option) == 1 && option >= 0 && option < field_index) {
+                        getchar();
+                        char new_value[MAXSIZE];
+                        get_user_input("Enter new value: ", new_value, sizeof(new_value));
+                        field[option] = new_value;
+                        modified = 1;
+                } 
+                else{
+                        printf("Invalid option.\n");
+                        getchar(); 
+                }
         }
 
         
@@ -384,6 +382,7 @@ int modify_entry(Firewall **head) {
         if (modified) {
             printf("Entry updated.\n");
         }
+
     }
 
     fclose(file);
@@ -392,6 +391,11 @@ int modify_entry(Firewall **head) {
     remove(FWDATA);
     rename("temp.csv", FWDATA);
 
+    get_user_input("do you want to make another modification? (yes/no): ",cont,sizeof(cont));
+    if(strcmp(cont,"no") == 0)
+            break;
+    }while(strcmp(cont,"yes") == 0);
     return 0;
 }
+
 
